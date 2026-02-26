@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipperAI - Auto Highlights for Streamers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header class="container top-nav">
+      <a class="logo" href="/">Clipper<span>AI</span></a>
+      <nav class="nav-links">
+        <a href="/pricing.html">Pricing</a>
+        <a href="/auth.html">Login</a>
+        <a class="btn" href="/auth.html">Get Started</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-grid">
+          <div>
+            <h1>Turn every <span class="gradient-text">stream spike</span> into viral clips.</h1>
+            <p>
+              ClipperAI watches Twitch and Kick streams, detects hype moments, auto-edits 9:16 clips,
+              burns captions, adds watermarking, and delivers ready-to-post videos after every stream.
+            </p>
+            <div style="display: flex; gap: 0.7rem; margin-top: 1rem">
+              <a class="btn" href="/auth.html">Start Free Setup</a>
+              <a class="btn secondary" href="/pricing.html">View Pricing</a>
+            </div>
+          </div>
+          <div class="card">
+            <h3>After each stream</h3>
+            <p class="muted">3-5 clips land in your dashboard with captions and export-ready format.</p>
+            <ul class="muted">
+              <li>Chat spike + keyword trigger detection</li>
+              <li>Automatic 9:16 reframing and subtitle burn-in</li>
+              <li>30-day hosted clip library with downloads</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section container">
+        <h2>Simple monthly pricing</h2>
+        <div class="pricing-grid">
+          <article class="card pricing-card">
+            <h3>Basic</h3>
+            <p class="price">$15<span class="muted">/mo</span></p>
+            <ul>
+              <li>1 platform connected</li>
+              <li>5 clips per stream</li>
+              <li>Auto captions</li>
+            </ul>
+            <button class="btn" data-checkout-plan="basic">Choose Basic</button>
+          </article>
+
+          <article class="card pricing-card">
+            <h3>Pro</h3>
+            <p class="price">$30<span class="muted">/mo</span></p>
+            <ul>
+              <li>Up to 3 platforms</li>
+              <li>Unlimited clips</li>
+              <li>Captions + auto-formatting</li>
+            </ul>
+            <button class="btn" data-checkout-plan="pro">Choose Pro</button>
+          </article>
+
+          <article class="card pricing-card">
+            <h3>Agency</h3>
+            <p class="price">$99<span class="muted">/mo</span></p>
+            <ul>
+              <li>Up to 10 connected accounts</li>
+              <li>Unlimited clips</li>
+              <li>White-label watermark option</li>
+            </ul>
+            <button class="btn" data-checkout-plan="agency">Choose Agency</button>
+          </article>
+        </div>
+        <p id="pricing-status"></p>
+      </section>
+
+      <section class="section container">
+        <h2>Trusted by growing streamers</h2>
+        <div class="testimonials">
+          <article class="card"><p class="muted">"Placeholder testimonial: increased short-form output 4x."</p></article>
+          <article class="card"><p class="muted">"Placeholder testimonial: no editing backlog after streams."</p></article>
+          <article class="card"><p class="muted">"Placeholder testimonial: clips are upload-ready in minutes."</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">© 2026 ClipperAI. Built for Twitch and Kick creators.</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/pricing.js"></script>
+  </body>
+</html>

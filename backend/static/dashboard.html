@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipperAI Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header class="container top-nav">
+      <a class="logo" href="/">Clipper<span>AI</span></a>
+      <nav class="nav-links">
+        <span id="user-email" class="muted">loading...</span>
+        <button id="manage-billing-btn" class="btn secondary">Upgrade / Manage Billing</button>
+        <button id="logout-btn" class="btn ghost">Logout</button>
+      </nav>
+    </header>
+
+    <main class="container dashboard-layout">
+      <section class="panel card" style="margin-bottom: 1rem">
+        <div class="panel-header">
+          <h3>Current Plan</h3>
+          <span class="badge badge-success" id="plan-tier">BASIC</span>
+        </div>
+        <p class="muted">Upgrade or manage your subscription anytime from Stripe Billing Portal.</p>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel card">
+          <h3>Connected Platforms</h3>
+          <div class="platform-grid">
+            <div class="card">
+              <div class="status-row">
+                <strong>Twitch</strong>
+                <span class="badge badge-muted" id="twitch-status">disconnected</span>
+              </div>
+              <p class="muted" id="twitch-login">Not connected</p>
+              <div style="display: flex; gap: 0.5rem">
+                <button class="btn" id="connect-twitch-btn" type="button">Connect Twitch</button>
+                <button class="btn ghost" id="disconnect-twitch-btn" type="button">Disconnect</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="status-row">
+                <strong>Kick</strong>
+                <span class="badge badge-muted" id="kick-status">disconnected</span>
+              </div>
+              <p class="muted" id="kick-channel">Not connected</p>
+              <div style="display: flex; gap: 0.5rem">
+                <button class="btn" id="connect-kick-btn" type="button">Connect Kick</button>
+                <button class="btn ghost" id="disconnect-kick-btn" type="button">Disconnect</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel card">
+          <h3>Clip Trigger Settings</h3>
+
+          <div class="form-group">
+            <label for="keyword-input">Keyword Triggers</label>
+            <div class="keyword-row">
+              <input id="keyword-input" type="text" placeholder="clip, insane, no way" />
+              <button class="btn secondary" type="button" id="add-keyword-btn">Add</button>
+            </div>
+            <div id="keyword-list" class="keyword-list"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="threshold-slider">Chat Spike Sensitivity</label>
+            <div class="slider-row">
+              <input id="threshold-slider" type="range" min="5" max="120" value="20" />
+              <strong id="threshold-value">20</strong>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="watermark-input">Watermark Name</label>
+            <input id="watermark-input" type="text" maxlength="40" placeholder="your brand name" />
+          </div>
+
+          <button id="save-settings-btn" class="btn" type="button">Save Settings</button>
+          <p id="dashboard-status"></p>
+        </article>
+      </section>
+
+      <section class="section">
+        <div class="panel-header" style="margin-bottom: 0.8rem">
+          <h3>Recent Clips</h3>
+          <span class="muted">Auto-deleted after 30 days</span>
+        </div>
+        <p id="clips-empty" class="muted" hidden>No clips yet. Go live and let ClipperAI detect highlights.</p>
+        <div id="clips-grid" class="clips-grid"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

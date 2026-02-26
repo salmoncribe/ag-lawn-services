@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipperAI Pricing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header class="container top-nav">
+      <a class="logo" href="/">Clipper<span>AI</span></a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/auth.html">Login</a>
+      </nav>
+    </header>
+
+    <main class="section container">
+      <h1>Pricing</h1>
+      <p class="muted">All plans include automatic clip generation and dashboard delivery after each stream.</p>
+
+      <div class="pricing-grid">
+        <article class="card pricing-card">
+          <h3>Basic</h3>
+          <p class="price">$15<span class="muted">/mo</span></p>
+          <ul>
+            <li>1 platform</li>
+            <li>5 clips per stream</li>
+            <li>Auto captions</li>
+          </ul>
+          <button class="btn" data-checkout-plan="basic">Start Basic</button>
+        </article>
+
+        <article class="card pricing-card">
+          <h3>Pro</h3>
+          <p class="price">$30<span class="muted">/mo</span></p>
+          <ul>
+            <li>Up to 3 platforms</li>
+            <li>Unlimited clips</li>
+            <li>Captions + auto-format</li>
+          </ul>
+          <button class="btn" data-checkout-plan="pro">Start Pro</button>
+        </article>
+
+        <article class="card pricing-card">
+          <h3>Agency</h3>
+          <p class="price">$99<span class="muted">/mo</span></p>
+          <ul>
+            <li>Up to 10 connected accounts</li>
+            <li>Unlimited clips</li>
+            <li>White-label watermark</li>
+          </ul>
+          <button class="btn" data-checkout-plan="agency">Start Agency</button>
+        </article>
+      </div>
+
+      <p id="pricing-status"></p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/pricing.js"></script>
+  </body>
+</html>
