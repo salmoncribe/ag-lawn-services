@@ -21,49 +21,59 @@ class ClipManager:
         self.pipeline = video_pipeline
         self._seen_keys: set[str] = set()
 
-    async def handle_highlight(self, profile: dict, highlight: HighlightEvent) -> dict | None:
-        dedupe_key = f"{highlight.user_id}:{highlight.platform}:{highlight.stream_id}:{highlight.timestamp_seconds // 5}"
-        if dedupe_key in self._seen_keys:
-            return None
-        self._seen_keys.add(dedupe_key)
-        if len(self._seen_keys) > 5000:
-            self._seen_keys.clear()
+    async def process_link(self, profile: dict, video_url: str) -> list[dict]:
+        user_id = profile["user_id"]
+        watermark = profile.get("watermark_text", "ClipperAI")
+        
+        try:
+            processed_list = await asyncio.to_thread(
+                self.pipeline.process_url,
+                video_url=video_url,
+                watermark=watermark,
+                keywords=profile.get("keyword_triggers", [])
+            )
+        except Exception as e:
+            print(f"Error processing URL {video_url}: {e}")
+            return []
 
-        if highlight.stream_id and not self._can_create_clip(profile, highlight.stream_id):
-            return None
+        created_clips = []
+        from app.deps import get_supabase_service
+        local_db = get_supabase_service()
 
-        processed = await asyncio.to_thread(self.pipeline.process_highlight, highlight)
+        for processed in processed_list:
+            storage_video_path = f"{user_id}/{processed.clip_id}.mp4"
+            storage_thumb_path = f"{user_id}/{processed.clip_id}.jpg"
 
-        storage_video_path = f"{highlight.user_id}/{processed.clip_id}.mp4"
-        storage_thumb_path = f"{highlight.user_id}/{processed.clip_id}.jpg"
+            video_url = await asyncio.to_thread(
+                self.storage.upload_clip,
+                processed.final_path,
+                storage_video_path,
+            )
+            thumb_url = await asyncio.to_thread(
+                self.storage.upload_clip,
+                processed.thumbnail_path,
+                storage_thumb_path,
+            )
 
-        video_url = await asyncio.to_thread(
-            self.storage.upload_clip,
-            processed.final_path,
-            storage_video_path,
-        )
-        thumb_url = await asyncio.to_thread(
-            self.storage.upload_clip,
-            processed.thumbnail_path,
-            storage_thumb_path,
-        )
+            payload = {
+                "clip_id": processed.clip_id,
+                "user_id": user_id,
+                "stream_id": "manual_link",
+                "platform": processed.platform,
+                "title": f"Clip from {video_url}",
+                "duration": processed.duration,
+                "status": "ready",
+                "storage_path": video_url,
+                "thumbnail_path": thumb_url,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+            
+            clip = local_db.create_clip(payload)
+            created_clips.append(clip)
+            
+            self._cleanup_local_files([processed.final_path, processed.thumbnail_path])
 
-        payload = {
-            "clip_id": processed.clip_id,
-            "user_id": highlight.user_id,
-            "platform": highlight.platform,
-            "stream_id": highlight.stream_id,
-            "stream_date": datetime.now(timezone.utc).isoformat(),
-            "duration": processed.duration,
-            "status": "ready",
-            "storage_path": storage_video_path,
-            "storage_url": video_url,
-            "thumbnail_url": thumb_url,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }
-        clip = self.supabase.create_clip(payload)
-        self._cleanup_local_files([processed.final_path, processed.thumbnail_path])
-        return clip
+        return created_clips
 
     def delete_clip_assets(self, clip: dict) -> None:
         storage_path = clip.get("storage_path")

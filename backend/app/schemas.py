@@ -10,9 +10,8 @@ class AuthPayload(BaseModel):
     password: str = Field(min_length=8)
 
 
-class KickConnectPayload(BaseModel):
-    api_key: str = Field(min_length=10)
-    channel_name: str = Field(min_length=2)
+class ProcessClipPayload(BaseModel):
+    video_url: str = Field(min_length=5)
 
 
 class SettingsPayload(BaseModel):
@@ -22,7 +21,7 @@ class SettingsPayload(BaseModel):
 
 
 class CheckoutPayload(BaseModel):
-    plan_tier: str
+    package_id: str
 
 
 class UserProfileResponse(BaseModel):

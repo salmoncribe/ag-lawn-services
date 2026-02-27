@@ -11,7 +11,7 @@
 
   function setStatus(message, type) {
     statusEl.textContent = message;
-    statusEl.dataset.type = type || "neutral";
+    statusEl.className = "status-msg " + (type === "error" ? "text-error" : type === "success" ? "text-success" : "muted");
   }
 
   function setMode(nextMode) {
@@ -37,12 +37,6 @@
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (!window.ClipperSDK.configured) {
-      setStatus("Set Supabase keys in static/js/config.js first.", "error");
-      return;
-    }
-
-    const client = window.ClipperSDK.getClient();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
@@ -50,19 +44,26 @@
     setStatus("Working...", "neutral");
 
     try {
-      if (mode === "signup") {
-        const { data, error } = await client.auth.signUp({ email, password });
-        if (error) throw error;
+      const endpoint = mode === "signup" ? "/auth/signup" : "/auth/login";
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-        if (!data.session) {
-          setStatus("Check your email to confirm your account, then sign in.", "success");
-        } else {
-          window.location.href = "/dashboard.html";
-        }
-      } else {
-        const { error } = await client.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || "Authentication failed.");
+      }
+
+      if (data.session && data.session.access_token) {
+        localStorage.setItem("clipper_token", data.session.access_token);
         window.location.href = "/dashboard.html";
+      } else {
+        throw new Error("Invalid response from server");
       }
     } catch (error) {
       setStatus(error.message || "Authentication failed.", "error");

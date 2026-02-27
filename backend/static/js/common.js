@@ -1,22 +1,10 @@
 (function () {
   const cfg = window.CLIPPER_CONFIG || {};
-  const configured = Boolean(
-    cfg.supabaseUrl &&
-      cfg.supabaseAnonKey &&
-      cfg.supabaseUrl !== "YOUR_SUPABASE_URL" &&
-      cfg.supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY"
-  );
-
-  const supabaseClient = configured
-    ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
-    : null;
 
   async function getSession() {
-    if (!supabaseClient) {
-      return null;
-    }
-    const { data } = await supabaseClient.auth.getSession();
-    return data.session;
+    const token = localStorage.getItem("clipper_token");
+    if (!token) return null;
+    return { access_token: token };
   }
 
   async function requireSession(redirectTo) {
@@ -29,8 +17,7 @@
   }
 
   async function logout() {
-    if (!supabaseClient) return;
-    await supabaseClient.auth.signOut();
+    localStorage.removeItem("clipper_token");
     window.location.href = "/auth.html";
   }
 
@@ -60,13 +47,8 @@
     return response.json();
   }
 
-  function getClient() {
-    return supabaseClient;
-  }
-
   window.ClipperSDK = {
-    configured,
-    getClient,
+    configured: true,
     getSession,
     requireSession,
     logout,

@@ -8,39 +8,35 @@ from app.config import Settings
 
 
 @dataclass(frozen=True)
-class PlanConfig:
-    tier: str
+class PackageConfig:
+    package_id: str
     price_id: str
-    clip_limit: int | None
-    connected_platforms: int
-
+    credits: int
 
 class StripeService:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         stripe.api_key = settings.stripe_secret_key
-        self.plans: dict[str, PlanConfig] = {
-            "basic": PlanConfig(
-                tier="basic",
+        # We repurpose the existing price environment variables as one-time package prices
+        self.packages: dict[str, PackageConfig] = {
+            "starter": PackageConfig(
+                package_id="starter",
                 price_id=settings.stripe_price_basic,
-                clip_limit=5,
-                connected_platforms=1,
+                credits=10,
             ),
-            "pro": PlanConfig(
-                tier="pro",
+            "creator": PackageConfig(
+                package_id="creator",
                 price_id=settings.stripe_price_pro,
-                clip_limit=None,
-                connected_platforms=3,
+                credits=50,
             ),
-            "agency": PlanConfig(
-                tier="agency",
+            "pro": PackageConfig(
+                package_id="pro",
                 price_id=settings.stripe_price_agency,
-                clip_limit=None,
-                connected_platforms=10,
+                credits=100,
             ),
         }
-        self.price_to_tier = {
-            config.price_id: tier for tier, config in self.plans.items() if config.price_id
+        self.price_to_package = {
+            config.price_id: config.package_id for config in self.packages.values() if config.price_id
         }
 
     def create_or_get_customer(self, email: str, customer_id: str | None = None) -> stripe.Customer:
@@ -55,21 +51,25 @@ class StripeService:
         self,
         user_id: str,
         email: str,
-        plan_tier: str,
+        package_id: str,
         customer_id: str | None = None,
     ) -> stripe.checkout.Session:
-        plan = self.plans.get(plan_tier)
-        if not plan or not plan.price_id:
-            raise ValueError("Unsupported subscription tier")
+        package = self.packages.get(package_id)
+        if not package or not package.price_id:
+            raise ValueError(f"Unsupported package ID: {package_id}")
 
         customer = self.create_or_get_customer(email, customer_id)
         return stripe.checkout.Session.create(
             customer=customer.id,
-            mode="subscription",
-            line_items=[{"price": plan.price_id, "quantity": 1}],
+            mode="payment", # One-time payment instead of subscription
+            line_items=[{"price": package.price_id, "quantity": 1}],
             success_url=self.settings.stripe_success_url,
             cancel_url=self.settings.stripe_cancel_url,
-            metadata={"user_id": user_id, "plan_tier": plan.tier},
+            metadata={
+                "user_id": user_id, 
+                "package_id": package.package_id,
+                "credits": package.credits
+            },
             allow_promotion_codes=True,
         )
 
@@ -85,10 +85,3 @@ class StripeService:
             sig_header=signature,
             secret=self.settings.stripe_webhook_secret,
         )
-
-    def tier_from_subscription(self, subscription: dict) -> str:
-        items = subscription.get("items", {}).get("data", [])
-        if not items:
-            return "basic"
-        price_id = items[0].get("price", {}).get("id")
-        return self.price_to_tier.get(price_id, "basic")

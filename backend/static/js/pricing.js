@@ -1,5 +1,5 @@
 (function () {
-  const checkoutButtons = document.querySelectorAll("[data-checkout-plan]");
+  const checkoutButtons = document.querySelectorAll("[data-checkout-package]");
   const status = document.getElementById("pricing-status");
 
   function setStatus(message, type) {
@@ -10,20 +10,20 @@
 
   checkoutButtons.forEach((button) => {
     button.addEventListener("click", async () => {
-      const plan = button.dataset.checkoutPlan;
+      const packageId = button.dataset.checkoutPackage;
       button.disabled = true;
       setStatus("Creating checkout session...", "neutral");
 
       try {
         const session = await window.ClipperSDK.getSession();
         if (!session) {
-          window.location.href = `/auth.html?plan=${encodeURIComponent(plan)}`;
+          window.location.href = `/auth.html?package=${encodeURIComponent(packageId)}`;
           return;
         }
 
         const result = await window.ClipperSDK.apiFetch("/billing/checkout", {
           method: "POST",
-          body: JSON.stringify({ plan_tier: plan }),
+          body: JSON.stringify({ package_id: packageId }),
         });
 
         window.location.href = result.checkout_url;

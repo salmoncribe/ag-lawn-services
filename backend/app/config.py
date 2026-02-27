@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     base_url: str = "http://localhost:8000"
+    cors_origins: list[str] = ["*"]
 
     supabase_url: str = ""
     supabase_anon_key: str = ""
@@ -28,6 +29,8 @@ class Settings(BaseSettings):
     stripe_price_agency: str = ""
     stripe_success_url: str = "http://localhost:8000/dashboard.html?checkout=success"
     stripe_cancel_url: str = "http://localhost:8000/pricing.html?checkout=cancel"
+
+    gemini_api_key: str | None = None
 
     twitch_client_id: str = ""
     twitch_client_secret: str = ""

@@ -1,68 +1,94 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClipperAI Pricing</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/css/styles.css" />
-  </head>
-  <body>
-    <header class="container top-nav">
-      <a class="logo" href="/">Clipper<span>AI</span></a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/auth.html">Login</a>
-      </nav>
-    </header>
 
-    <main class="section container">
-      <h1>Pricing</h1>
-      <p class="muted">All plans include automatic clip generation and dashboard delivery after each stream.</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClipperAI — Pricing</title>
+  <meta name="description"
+    content="Simple credit-based pricing. One credit = one video processed into multiple AI-edited shorts." />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
 
-      <div class="pricing-grid">
-        <article class="card pricing-card">
-          <h3>Basic</h3>
-          <p class="price">$15<span class="muted">/mo</span></p>
-          <ul>
-            <li>1 platform</li>
-            <li>5 clips per stream</li>
-            <li>Auto captions</li>
-          </ul>
-          <button class="btn" data-checkout-plan="basic">Start Basic</button>
-        </article>
+<body>
+  <header class="container top-nav">
+    <a class="logo" href="/">Clipper<span>AI</span></a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/auth.html">Log in</a>
+      <a class="btn" href="/auth.html">Get Started</a>
+    </nav>
+  </header>
 
-        <article class="card pricing-card">
-          <h3>Pro</h3>
-          <p class="price">$30<span class="muted">/mo</span></p>
-          <ul>
-            <li>Up to 3 platforms</li>
-            <li>Unlimited clips</li>
-            <li>Captions + auto-format</li>
-          </ul>
-          <button class="btn" data-checkout-plan="pro">Start Pro</button>
-        </article>
+  <main class="section container">
+    <div class="section-header">
+      <h2>Simple, transparent pricing</h2>
+      <p>One credit = one video processed into multiple AI-edited shorts. No subscriptions.</p>
+    </div>
 
-        <article class="card pricing-card">
-          <h3>Agency</h3>
-          <p class="price">$99<span class="muted">/mo</span></p>
-          <ul>
-            <li>Up to 10 connected accounts</li>
-            <li>Unlimited clips</li>
-            <li>White-label watermark</li>
-          </ul>
-          <button class="btn" data-checkout-plan="agency">Start Agency</button>
-        </article>
-      </div>
+    <div class="pricing-grid">
+      <article class="card pricing-card">
+        <h3>Starter</h3>
+        <p class="price">$5</p>
+        <ul>
+          <li>10 Credits</li>
+          <li>YouTube & Twitch support</li>
+          <li>AI viral detection</li>
+          <li>Auto 9:16 cropping</li>
+        </ul>
+        <button class="btn secondary" data-checkout-package="starter">Buy Starter</button>
+      </article>
 
-      <p id="pricing-status"></p>
-    </main>
+      <article class="card pricing-card featured">
+        <div class="pricing-badge">Popular</div>
+        <h3>Creator</h3>
+        <p class="price">$20</p>
+        <ul>
+          <li>50 Credits</li>
+          <li>Priority processing</li>
+          <li>AI viral detection</li>
+          <li>Auto 9:16 cropping</li>
+        </ul>
+        <button class="btn" data-checkout-package="creator">Buy Creator</button>
+      </article>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/config.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/pricing.js"></script>
-  </body>
+      <article class="card pricing-card">
+        <h3>Pro</h3>
+        <p class="price">$35</p>
+        <ul>
+          <li>100 Credits</li>
+          <li>Bulk processing</li>
+          <li>AI viral detection</li>
+          <li>Auto 9:16 cropping</li>
+        </ul>
+        <button class="btn secondary" data-checkout-package="pro">Buy Pro</button>
+      </article>
+    </div>
+
+    <p id="pricing-status" class="status-msg" style="text-align: center; margin-top: 1.5rem;"></p>
+  </main>
+
+  <footer class="footer">
+    <div class="container">&copy; 2026 ClipperAI. AI-powered video clipping for creators.</div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/pricing.js"></script>
+  <script>
+    // Session-aware nav
+    (async function () {
+      if (!window.ClipperSDK) return;
+      const session = await window.ClipperSDK.getSession();
+      if (session) {
+        document.querySelectorAll('a[href="/auth.html"]').forEach(a => {
+          a.href = '/dashboard.html';
+          if (a.textContent.trim() === 'Log in') a.textContent = 'Dashboard';
+          if (a.textContent.trim() === 'Get Started') a.textContent = 'Dashboard';
+        });
+      }
+    })();
+  </script>
+</body>
+
 </html>
