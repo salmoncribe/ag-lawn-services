@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 export function FloatingBookButton() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay: 0.35, duration: 0.45 }}
       className="fixed bottom-5 right-5 z-50"
     >

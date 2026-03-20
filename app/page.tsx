@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { BookingWizard } from "@/components/forms/booking-wizard";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ServicesPreview } from "@/components/sections/services-preview";
@@ -27,8 +26,6 @@ const jsonLd = {
 };
 
 export default async function HomePage() {
-  const session = await auth();
-
   return (
     <>
       <script
@@ -45,7 +42,6 @@ export default async function HomePage() {
             embedded
             initialServiceId="premium-mow"
             stripePublishableKey={process.env.STRIPE_PUBLISHABLE_KEY ?? ""}
-            viewerName={session?.user?.name}
           />
         </div>
       </section>

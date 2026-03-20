@@ -8,8 +8,8 @@ export function TrustBar() {
     <section className="border-y border-white/35 bg-secondary/70">
       <div className="container py-5">
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.45 }}
           className="flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:gap-6"

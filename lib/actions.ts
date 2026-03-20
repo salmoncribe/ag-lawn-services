@@ -20,12 +20,6 @@ import { type ServiceId } from "@/lib/site-data";
 export async function createCheckoutSessionAction(values: BookingValues) {
   const session = await auth();
 
-  if (!session?.user?.id) {
-    return {
-      error: "Log in as Billy or Josh before checkout."
-    };
-  }
-
   const parsed = bookingSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -56,18 +50,28 @@ export async function createCheckoutSessionAction(values: BookingValues) {
     parsed.data.timeSlot
   );
 
-  const booking = await prisma.booking.create({
-    data: {
-      userId: session.user.id,
-      serviceType: parsed.data.serviceId,
-      addons: parsed.data.addons,
-      date: serviceDate,
-      address: `${parsed.data.address}, ${parsed.data.city}`,
-      notes: parsed.data.lawnSizeNote,
-      status: "PENDING",
-      totalPrice
+  let bookingId: string | null = null;
+
+  if (session?.user?.id) {
+    try {
+      const booking = await prisma.booking.create({
+        data: {
+          userId: session.user.id,
+          serviceType: parsed.data.serviceId,
+          addons: parsed.data.addons,
+          date: serviceDate,
+          address: `${parsed.data.address}, ${parsed.data.city}`,
+          notes: parsed.data.lawnSizeNote,
+          status: "PENDING",
+          totalPrice
+        }
+      });
+
+      bookingId = booking.id;
+    } catch (error) {
+      console.error("Booking persistence skipped:", error);
     }
-  });
+  }
 
   const headerStore = await headers();
   const origin =
@@ -79,13 +83,24 @@ export async function createCheckoutSessionAction(values: BookingValues) {
   const checkoutSession = await stripe.checkout.sessions.create({
     mode: "payment",
     billing_address_collection: "auto",
+    phone_number_collection: {
+      enabled: true
+    },
     allow_promotion_codes: false,
-    success_url: `${origin}/dashboard?success=true&bookingId=${booking.id}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/pricing`,
+    customer_creation: "always",
+    success_url: `${origin}/book/success?session_id={CHECKOUT_SESSION_ID}${bookingId ? `&bookingId=${bookingId}` : ""}`,
+    cancel_url: `${origin}/book?service=${parsed.data.serviceId}`,
     metadata: {
-      bookingId: booking.id,
+      bookingId: bookingId ?? "",
       serviceId: parsed.data.serviceId,
-      userId: session.user.id
+      serviceName: service.name,
+      serviceDate: parsed.data.serviceDate,
+      timeSlot: parsed.data.timeSlot,
+      address: `${parsed.data.address}, ${parsed.data.city}`,
+      addons: applicableAddons.map((addon) => addon.name).join(", "),
+      lawnSizeNote: parsed.data.lawnSizeNote.slice(0, 500),
+      totalPrice: String(totalPrice),
+      userId: session?.user?.id ?? ""
     },
     line_items: [
       {
@@ -113,12 +128,18 @@ export async function createCheckoutSessionAction(values: BookingValues) {
     ]
   });
 
-  await prisma.booking.update({
-    where: { id: booking.id },
-    data: {
-      stripeSessionId: checkoutSession.id
+  if (bookingId) {
+    try {
+      await prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+          stripeSessionId: checkoutSession.id
+        }
+      });
+    } catch (error) {
+      console.error("Booking session persistence skipped:", error);
     }
-  });
+  }
 
   return {
     sessionId: checkoutSession.id

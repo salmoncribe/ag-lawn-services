@@ -18,10 +18,12 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-[#f8f2e8] text-foreground antialiased;
+    overflow-x: hidden;
     background-image:
       radial-gradient(circle at top left, rgba(22, 101, 52, 0.08), transparent 30%),
       radial-gradient(circle at bottom right, rgba(246, 232, 207, 0.9), transparent 30%),

@@ -14,8 +14,8 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(246,232,207,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(132,204,22,0.14),transparent_26%)]" />
       <div className="container relative z-10 grid gap-10 py-20 md:py-28 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.55 }}
           className="max-w-3xl space-y-7"
         >
@@ -23,7 +23,7 @@ export function HeroSection() {
             Same-day mowing and expert lawn treatments in Lubbock, Texas
           </Badge>
           <div className="space-y-4">
-            <h1 className="font-display text-[3.4rem] uppercase leading-[0.92] tracking-[0.06em] text-white sm:text-[4.25rem] lg:text-[5.6rem]">
+            <h1 className="text-balance font-display text-[2.7rem] uppercase leading-[0.94] tracking-[0.04em] text-white sm:text-[4.25rem] sm:tracking-[0.06em] lg:text-[5.6rem]">
               Same-Day Mowing &amp; Expert Treatments in Lubbock — Book in 60
               Seconds
             </h1>
@@ -66,8 +66,8 @@ export function HeroSection() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.55 }}
           className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1"
         >

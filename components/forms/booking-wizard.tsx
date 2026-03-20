@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { addDays, format, isToday, startOfToday } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -59,14 +58,12 @@ const steps = [
 type BookingWizardProps = {
   stripePublishableKey: string;
   initialServiceId: ServiceId;
-  viewerName?: string | null;
   embedded?: boolean;
 };
 
 export function BookingWizard({
   stripePublishableKey,
   initialServiceId,
-  viewerName,
   embedded = false
 }: BookingWizardProps) {
   const [step, setStep] = useState(0);
@@ -126,11 +123,6 @@ export function BookingWizard({
 
   const onSubmit = async (values: BookingValues) => {
     setSubmitError("");
-
-    if (!viewerName) {
-      setSubmitError("Sign in to continue to secure checkout.");
-      return;
-    }
 
     startTransition(async () => {
       if (!stripePublishableKey) {
@@ -208,15 +200,9 @@ export function BookingWizard({
                 <p className="text-sm uppercase tracking-[0.24em] text-white/55">
                   Live total
                 </p>
-                {viewerName ? (
-                  <Badge variant="secondary" className="bg-[#dff7b4] text-primary">
-                    Signed in as {viewerName}
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="bg-white/15 text-white">
-                    Sign in required for checkout
-                  </Badge>
-                )}
+                <Badge variant="secondary" className="bg-[#dff7b4] text-primary">
+                  No sign-in required
+                </Badge>
               </div>
               <p className="font-display text-6xl uppercase tracking-[0.06em] text-[#ecffcf]">
                 {formatCurrency(total)}
@@ -239,9 +225,9 @@ export function BookingWizard({
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -18 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.28 }}
               className="space-y-6"
             >
@@ -559,20 +545,17 @@ export function BookingWizard({
                     </CardContent>
                   </Card>
 
-                  {!viewerName ? (
-                    <Card className="border-primary/20 bg-secondary/70">
-                      <CardContent className="space-y-4 p-6">
-                        <p className="font-semibold text-secondary-foreground">
-                          Sign in to continue to secure payment and booking confirmation.
-                        </p>
-                        <Button asChild>
-                          <Link href={`/login?callbackUrl=/book?service=${selectedServiceId}`}>
-                            Sign in to continue
-                          </Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : null}
+                  <Card className="border-primary/20 bg-secondary/70">
+                    <CardContent className="space-y-3 p-6">
+                      <p className="font-semibold text-secondary-foreground">
+                        No account setup needed. Stripe handles payment and your booking
+                        confirmation lands immediately after checkout.
+                      </p>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        Customers can book, pay, and finish without creating a login.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               ) : null}
             </motion.div>
@@ -605,7 +588,7 @@ export function BookingWizard({
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={isPending || !viewerName}>
+              <Button type="submit" disabled={isPending}>
                 {isPending ? "Starting Stripe..." : "Pay Securely with Stripe"}
               </Button>
             )}
