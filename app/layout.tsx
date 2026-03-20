@@ -18,8 +18,10 @@ const body = Manrope({
   variable: "--font-body"
 });
 
+const siteUrl = process.env.NEXTAUTH_URL ?? "https://ag-lawn-services.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lubbocklawnpros.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Lubbock Lawn Pros | Same-Day Mowing & Expert Treatments in Lubbock",
     template: "%s | Lubbock Lawn Pros"
@@ -40,7 +42,7 @@ export const metadata: Metadata = {
       "Same-Day Mowing & Expert Treatments in Lubbock — Book in 60 Seconds.",
     type: "website",
     locale: "en_US",
-    url: "https://lubbocklawnpros.com",
+    url: siteUrl,
     siteName: "Lubbock Lawn Pros",
     images: [
       {

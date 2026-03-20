@@ -6,11 +6,13 @@ import { TestimonialsSection } from "@/components/sections/testimonials-section"
 import { TrustBar } from "@/components/sections/trust-bar";
 import { WhyUsSection } from "@/components/sections/why-us-section";
 
+const siteUrl = process.env.NEXTAUTH_URL ?? "https://ag-lawn-services.vercel.app";
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "Lubbock Lawn Pros",
-  image: "https://lubbocklawnpros.com/opengraph-image",
+  image: `${siteUrl}/opengraph-image`,
   telephone: "806-555-LAWN",
   address: {
     "@type": "PostalAddress",
