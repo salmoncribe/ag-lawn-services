@@ -1,125 +1,105 @@
-# ClipperAI
+# Lubbock Lawn Pros
 
-ClipperAI is a FastAPI + Supabase SaaS app for streamers that auto-detects highlights, processes short-form vertical clips, and delivers them through a web dashboard.
+Production-ready Next.js 15 starter site for a new lawn care business in Lubbock, Texas. The app includes a polished marketing site, multi-step booking flow, protected dashboard, Prisma schema, Neon Postgres setup, and Stripe Checkout session creation on every booking.
 
 ## Stack
 
-- Backend: Python, FastAPI, APScheduler
-- Database/Auth/Storage: Supabase (Postgres + Auth + Storage)
-- Payments: Stripe Checkout + Billing Portal + Webhooks
-- Frontend: Plain HTML/CSS/JS (no framework)
-- Processing: `yt-dlp`, Whisper (`base`), FFmpeg
+- Next.js 15 App Router
+- React 19 + TypeScript
+- Tailwind CSS + shadcn/ui-style components
+- Prisma + Neon Postgres
+- NextAuth.js Credentials provider only
+- Stripe Checkout Sessions
+- React Hook Form + Zod
+- Framer Motion
+- Lucide icons
+- Date-fns + shadcn Calendar
 
-## Implemented Features
+## Environment variables
 
-- Supabase email/password auth flow support
-- Protected dashboard via Supabase JWT
-- Profile + settings persistence in Supabase
-- Stripe subscription tiers: Basic / Pro / Agency
-- Stripe webhook-based plan updates on success/failure/cancel
-- Twitch OAuth connect callback and token storage (encrypted)
-- Kick API key connect flow and encrypted storage
-- Background monitoring scheduler:
-  - Polls connected profiles
-  - Detects Twitch live status and chat spikes/keywords
-  - Polls Kick live status with viewer-spike fallback trigger
-- Clip pipeline:
-  - Segment download (`yt-dlp`)
-  - Whisper caption SRT generation
-  - 9:16 vertical render + subtitle burn-in + watermark via FFmpeg
-- Supabase Storage upload + clip gallery metadata
-- Clip list and deletion API
-- 30-day retention cleanup job
-- Landing, pricing, auth, and dashboard pages
-
-## Project Layout
-
-- `backend/app/main.py` - FastAPI app, router wiring, scheduler startup
-- `backend/app/routers/` - API routes (`auth`, `user`, `billing`, `clips`)
-- `backend/app/services/` - Supabase, Stripe, Twitch, monitoring, video pipeline
-- `backend/static/` - frontend HTML/CSS/JS
-- `backend/sql/schema.sql` - Supabase schema + RLS + cleanup function
-
-## Setup
-
-1. Install system tools:
-   - `ffmpeg`
-   - `yt-dlp`
-   - Python 3.11+
-
-2. Create Supabase project and run:
-   - `backend/sql/schema.sql`
-
-3. Configure Supabase Auth:
-   - Site URL: `http://localhost:8000`
-   - Redirect URL: `http://localhost:8000/auth/twitch/callback`
-
-4. Configure Twitch app:
-   - OAuth Redirect URL: `http://localhost:8000/auth/twitch/callback`
-
-5. Configure Stripe:
-   - Create recurring prices for Basic/Pro/Agency
-   - Set webhook endpoint to `http://localhost:8000/billing/webhook`
-   - Enable events:
-     - `checkout.session.completed`
-     - `customer.subscription.updated`
-     - `customer.subscription.deleted`
-     - `invoice.payment_failed`
-
-6. Configure environment:
+Replace these values:
 
 ```bash
-cd backend
-cp .env.example .env
+NEON_DATABASE_URL=your-neon-connection-string-here
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXTAUTH_SECRET=generate-a-random-32-char-string-here
+NEXTAUTH_URL=http://localhost:3000
 ```
 
-Update `.env` with real Supabase/Stripe/Twitch keys.
-
-7. Set frontend runtime config:
-   - Edit `backend/static/js/config.js`
-   - Set `supabaseUrl` and `supabaseAnonKey`
-
-8. Install Python packages and run:
+## Local setup
 
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+npm install
+cp .env.example .env.local
 ```
 
-Open `http://localhost:8000`.
-
-## Docker
+Update `.env.local` with your real Neon and Stripe values, then run:
 
 ```bash
-cp backend/.env.example backend/.env
-# fill values in backend/.env
-
-docker compose up --build
+npm run db:push
+npm run db:seed
+npm run dev
 ```
 
-## API Routes
+Open [http://localhost:3000](http://localhost:3000).
 
-- `POST /auth/signup`
-- `POST /auth/login`
-- `POST /auth/logout`
-- `GET /auth/twitch/start`
-- `GET /auth/twitch/callback`
-- `GET /user/profile`
-- `PUT /user/settings`
-- `PUT /user/connect/kick`
-- `DELETE /user/connect/kick`
-- `DELETE /user/connect/twitch`
-- `GET /clips`
-- `DELETE /clips/{clip_id}`
-- `POST /billing/checkout`
-- `POST /billing/portal`
-- `POST /billing/webhook`
+## Prisma commands
 
-## Notes
+```bash
+npm run prisma:generate
+npm run db:push
+npm run db:seed
+```
 
-- Twitch and Kick APIs evolve frequently; verify scopes, endpoints, and API limits in your account.
-- Whisper model download happens on first run and can take time.
-- For production, put FastAPI behind HTTPS reverse proxy and lock CORS origins.
+## Booking and auth behavior
+
+- Booking uses a server action to create a brand-new Stripe Checkout Session every time.
+- Stripe success returns to `/dashboard?success=true`.
+- The dashboard is protected with NextAuth credentials sessions.
+- The `authorize` flow checks the seeded account records stored in Prisma.
+
+## Stripe notes
+
+- `STRIPE_SECRET_KEY` is used server-side to create Checkout Sessions.
+- `STRIPE_PUBLISHABLE_KEY` is passed into the booking UI for `redirectToCheckout`.
+- Success URL: `/dashboard?success=true&bookingId=...&session_id=...`
+- Cancel URL: `/pricing`
+
+## Neon notes
+
+- Use your Neon Postgres connection string for `NEON_DATABASE_URL`.
+- `prisma db push` will create the schema directly in Neon.
+- The seed script inserts Billy, Josh, sample bookings, and one subscription per user.
+
+## Deployment notes for Vercel + Neon
+
+- Create a new Vercel project from this repo.
+- Add the same environment variables in Vercel:
+  - `NEON_DATABASE_URL`
+  - `STRIPE_SECRET_KEY`
+  - `STRIPE_PUBLISHABLE_KEY`
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+- Point `NEXTAUTH_URL` at your production domain.
+- Run `npm run db:push` and `npm run db:seed` against Neon before or immediately after launch.
+- Vercel auto-detects the app as Next.js through `vercel.json`.
+
+## Project highlights
+
+- `/` landing page with hero, trust bar, services, why-us, testimonials, and embedded booking flow
+- `/services` clear mowing and treatment pricing
+- `/pricing` bundles, subscriptions, savings toggle, and upsell framing
+- `/book` full-screen multi-step booking wizard
+- `/login` protected access page
+- `/dashboard` protected account dashboard with confetti success state
+
+## Useful files
+
+- `app/page.tsx`
+- `app/book/page.tsx`
+- `app/dashboard/page.tsx`
+- `lib/actions.ts`
+- `auth.ts`
+- `prisma/schema.prisma`
+- `prisma/seed.ts`
